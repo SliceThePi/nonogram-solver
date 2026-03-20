@@ -21,14 +21,14 @@ class Rule {
 }
 
 class GridError extends Error {
-    constructor(message: string | undefined) {
+    constructor(message?: string) {
         super(`GridError${message ? ': ' + message : ''}`)
     }
 }
 
 class GridMismatchError extends GridError {
     constructor(type: 'row' | 'column') {
-        if(type === 'row')
+        if (type === 'row')
             super('Row width mismatch!')
         else
             super('Column height mismatch!')
@@ -58,7 +58,7 @@ class Grid {
 
     constructor(width: number, height: number)
     constructor(cells: Cell[][])
-    constructor(width_cells: number | Cell[][], height: number | undefined = undefined) {
+    constructor(width_cells: number | Cell[][], height?: number) {
         if (typeof width_cells === 'number') {
             if (typeof height !== 'number')
                 throw new GridError('Invalid usage of Grid constructor!')
