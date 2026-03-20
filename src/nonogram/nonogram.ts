@@ -103,6 +103,70 @@ class Grid {
             throw new RangeError('Invalid cell coordinates!')
         this.#cells[x]![y] = cell
     }
+
+    push_column(column?: Cell[]) {
+        if (!column)
+            this.#cells.push(new Array(this.height).fill(null))
+        else if (column.length != this.height)
+            throw new ColumnMismatchError()
+        else
+            this.#cells.push(column)
+        return this.width
+    }
+
+    pop_column(): Cell[] {
+        if (this.#cells.length <= 1)
+            throw new EmptyGridError()
+        return this.#cells.pop()!
+    }
+
+    unshift_column(column?: Cell[]) {
+        if (!column)
+            this.#cells.unshift(new Array(this.height).fill(null))
+        else if (column.length != this.height)
+            throw new ColumnMismatchError()
+        else
+            this.#cells.unshift(column)
+        return this.width
+    }
+
+    shift_column(): Cell[] {
+        if (this.#cells.length <= 1)
+            throw new EmptyGridError()
+        return this.#cells.shift()!
+    }
+
+    push_row(row?: Cell[]) {
+        if (!row)
+            this.#cells.forEach(x => x.push(null))
+        else if (row.length != this.width)
+            throw new RowMismatchError()
+        else
+            this.#cells.forEach((x, idx) => x.push(row[idx]!))
+        return this.height
+    }
+
+    pop_row(): Cell[] {
+        if (this.#cells[0]!.length <= 1)
+            throw new EmptyGridError()
+        return this.#cells.map(x => x.pop()!)
+    }
+
+    unshift_row(row?: Cell[]) {
+        if (!row)
+            this.#cells.forEach(x => x.unshift(null))
+        else if (row.length != this.width)
+            throw new RowMismatchError()
+        else
+            this.#cells.forEach((x, idx) => x.unshift(row[idx]!))
+        return this.height
+    }
+
+    shift_row(): Cell[] {
+        if (this.#cells[0]!.length <= 1)
+            throw new EmptyGridError()
+        return this.#cells.map(x => x.shift()!)
+    }
 }
 
 class Puzzle {
