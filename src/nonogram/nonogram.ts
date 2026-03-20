@@ -62,7 +62,7 @@ class Grid {
         if (typeof width_cells === 'number') {
             if (typeof height !== 'number')
                 throw new GridError('Invalid usage of Grid constructor!')
-            this.cells = new Array(width_cells).map(() => new Array(height).fill(null))
+            this.cells = new Array(height).map(() => new Array(width_cells).fill(null))
         }
         else {
             if (height !== undefined)
@@ -78,36 +78,36 @@ class Grid {
     set cells(value: Cell[][]) {
         if (value.length === 0 || value[0]!.length === 0)
             throw new EmptyGridError()
-        for (const column of value)
-            if (column.length != value[0]!.length)
-                throw new ColumnMismatchError()
+        for (const row of value)
+            if (row.length != value[0]!.length)
+                throw new RowMismatchError()
         this.#cells = value.map(x => x.slice())
     }
 
     get width() {
-        return this.cells.length
+        return this.cells[0]!.length
     }
 
     get height() {
-        return this.cells[0]!.length
+        return this.cells.length
     }
 
     get(x: number, y: number): Cell {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height)
             return false
-        return this.#cells[x]![y]!
+        return this.#cells[y]![x]!
     }
 
     set(x: number, y: number, cell: Cell) {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height)
             throw new RangeError('Invalid cell coordinates!')
-        this.#cells[x]![y] = cell
+        this.#cells[y]![x] = cell
     }
 
     get_column(x: number): ReadonlyArray<Cell> {
         if (x < 0 || x >= this.width)
             throw new RangeError('Invalid column index!')
-        return this.#cells[x]!
+        return this.#cells.map(row => row[x]!)
     }
 
     set_column(x: number, column: Cell[]) {
@@ -115,13 +115,13 @@ class Grid {
             throw new RangeError('Invalid column index!')
         if (column.length != this.height)
             throw new ColumnMismatchError()
-        this.#cells[x]! = column.slice()
+        this.#cells.forEach((row, idx) => row[x] = column[idx]!)
     }
 
     get_row(y: number): ReadonlyArray<Cell> {
         if (y < 0 || y >= this.height)
             throw new RangeError('Invalid row index!')
-        return this.#cells.map(x => x[y]!)
+        return this.#cells[y]!
     }
 
     set_row(y: number, row: Cell[]) {
@@ -129,71 +129,71 @@ class Grid {
             throw new RangeError('Invalid row index!')
         if (row.length != this.width)
             throw new RowMismatchError()
-        this.#cells.forEach((x, idx) => x[y] = row[idx]!)
+        this.#cells[y] = row.slice()
     }
 
     push_column(column?: Cell[]) {
         if (!column)
-            this.#cells.push(new Array(this.height).fill(null))
+            this.#cells.forEach(row => row.push(null))
         else if (column.length != this.height)
             throw new ColumnMismatchError()
         else
-            this.#cells.push(column)
+            this.#cells.forEach((row, idx) => row.push(column[idx]!))
         return this.width
     }
 
     pop_column(): Cell[] {
+        if (this.#cells[0]!.length <= 1)
+            throw new EmptyGridError()
+        return this.#cells.map(row => row.pop()!)
+    }
+
+    unshift_column(column?: Cell[]) {
+        if (!column)
+            this.#cells.forEach(row => row.unshift(null))
+        else if (column.length != this.height)
+            throw new ColumnMismatchError()
+        else
+            this.#cells.forEach((row, idx) => row.unshift(column[idx]!))
+        return this.width
+    }
+
+    shift_column(): Cell[] {
+        if (this.#cells[0]!.length <= 1)
+            throw new EmptyGridError()
+        return this.#cells.map(row => row.shift()!)
+    }
+
+    push_row(row?: Cell[]) {
+        if (!row)
+            this.#cells.push(new Array(this.width).fill(null))
+        else if (row.length != this.width)
+            throw new RowMismatchError()
+        else
+            this.#cells.push(row.slice())
+        return this.height
+    }
+
+    pop_row(): Cell[] {
         if (this.#cells.length <= 1)
             throw new EmptyGridError()
         return this.#cells.pop()!
     }
 
-    unshift_column(column?: Cell[]) {
-        if (!column)
-            this.#cells.unshift(new Array(this.height).fill(null))
-        else if (column.length != this.height)
-            throw new ColumnMismatchError()
-        else
-            this.#cells.unshift(column)
-        return this.width
-    }
-
-    shift_column(): Cell[] {
-        if (this.#cells.length <= 1)
-            throw new EmptyGridError()
-        return this.#cells.shift()!
-    }
-
-    push_row(row?: Cell[]) {
-        if (!row)
-            this.#cells.forEach(x => x.push(null))
-        else if (row.length != this.width)
-            throw new RowMismatchError()
-        else
-            this.#cells.forEach((x, idx) => x.push(row[idx]!))
-        return this.height
-    }
-
-    pop_row(): Cell[] {
-        if (this.#cells[0]!.length <= 1)
-            throw new EmptyGridError()
-        return this.#cells.map(x => x.pop()!)
-    }
-
     unshift_row(row?: Cell[]) {
         if (!row)
-            this.#cells.forEach(x => x.unshift(null))
+            this.#cells.unshift(new Array(this.width).fill(null))
         else if (row.length != this.width)
             throw new RowMismatchError()
         else
-            this.#cells.forEach((x, idx) => x.unshift(row[idx]!))
+            this.#cells.unshift(row.slice())
         return this.height
     }
 
     shift_row(): Cell[] {
-        if (this.#cells[0]!.length <= 1)
+        if (this.#cells.length <= 1)
             throw new EmptyGridError()
-        return this.#cells.map(x => x.shift()!)
+        return this.#cells.shift()!
     }
 }
 
