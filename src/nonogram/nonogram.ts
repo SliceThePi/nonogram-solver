@@ -145,3 +145,18 @@ class Puzzle {
         throw new Error('Not implemented!')
     }
 }
+
+export type {
+    Cell
+}
+
+export {
+    Rule,
+    Grid,
+    Puzzle,
+    GridError,
+    GridMismatchError,
+    ColumnMismatchError,
+    RowMismatchError,
+    EmptyGridError,
+}
