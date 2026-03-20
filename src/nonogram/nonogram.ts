@@ -104,6 +104,34 @@ class Grid {
         this.#cells[x]![y] = cell
     }
 
+    get_column(x: number): ReadonlyArray<Cell> {
+        if (x < 0 || x >= this.width)
+            throw new RangeError('Invalid column index!')
+        return this.#cells[x]!
+    }
+
+    set_column(x: number, column: Cell[]) {
+        if (x < 0 || x >= this.width)
+            throw new RangeError('Invalid column index!')
+        if (column.length != this.height)
+            throw new ColumnMismatchError()
+        this.#cells[x]! = column.slice()
+    }
+
+    get_row(y: number): ReadonlyArray<Cell> {
+        if (y < 0 || y >= this.height)
+            throw new RangeError('Invalid row index!')
+        return this.#cells.map(x => x[y]!)
+    }
+
+    set_row(y: number, row: Cell[]) {
+        if (y < 0 || y >= this.height)
+            throw new RangeError('Invalid row index!')
+        if (row.length != this.width)
+            throw new RowMismatchError()
+        this.#cells.forEach((x, idx) => x[y] = row[idx]!)
+    }
+
     push_column(column?: Cell[]) {
         if (!column)
             this.#cells.push(new Array(this.height).fill(null))
