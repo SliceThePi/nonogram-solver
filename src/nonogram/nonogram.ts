@@ -20,9 +20,40 @@ class Rule {
     }
 }
 
+class GridError extends Error {
+    constructor(message: string | undefined) {
+        super(`GridError${message ? ': ' + message : ''}`)
+    }
+}
+
+class GridMismatchError extends GridError {
+    constructor(type: 'row' | 'column') {
+        if(type === 'row')
+            super('Row width mismatch!')
+        else
+            super('Column height mismatch!')
+    }
+}
+
+class ColumnMismatchError extends GridMismatchError {
+    constructor() {
+        super('column')
+    }
+}
+
+class RowMismatchError extends GridMismatchError {
+    constructor() {
+        super('row')
+    }
+}
+
+class EmptyGridError extends GridError {
+    constructor() {
+        super('Grid cannnot be empty!')
+    }
+}
+
 class Grid {
-    #width!: number
-    #height!: number
     #cells!: Cell[][]
 
     constructor(width: number, height: number)
@@ -30,14 +61,12 @@ class Grid {
     constructor(width_cells: number | Cell[][], height: number | undefined = undefined) {
         if (typeof width_cells === 'number') {
             if (typeof height !== 'number')
-                throw new Error('Invalid usage of Grid constructor!')
-            if (width_cells <= 0 || height <= 0)
-                throw Error('Grid cannot be empty!')
+                throw new GridError('Invalid usage of Grid constructor!')
             this.cells = new Array(width_cells).map(() => new Array(height).fill(null))
         }
         else {
             if (height !== undefined)
-                throw new Error('Invalid usage of Grid constructor!')
+                throw new GridError('Invalid usage of Grid constructor!')
             this.cells = width_cells
         }
     }
@@ -48,26 +77,19 @@ class Grid {
 
     set cells(value: Cell[][]) {
         if (value.length === 0 || value[0]!.length === 0)
-            throw new Error('Grid cannot be empty!')
+            throw new EmptyGridError()
         for (const column of value)
             if (column.length != value[0]!.length)
-                throw new Error('Mismatched column heights!')
+                throw new ColumnMismatchError()
         this.#cells = value.map(x => x.slice())
-        this.#width = this.#cells.length
-        this.#height = this.#cells[0]!.length
     }
 
     get width() {
-        return this.#width
-    }
-
-    set width(value: number) {
-        if (value <= 0)
-            throw new Error('Grid cannot be empty!')
+        return this.cells.length
     }
 
     get height() {
-        return this.#height
+        return this.cells[0]!.length
     }
 
     get(x: number, y: number): Cell {
