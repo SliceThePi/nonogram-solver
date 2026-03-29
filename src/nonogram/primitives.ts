@@ -50,7 +50,7 @@ export const Point: NonogramPrimitiveDefinition<Point, [number, number]> = {
 
 /**
  * Represents a single column or row rule, which consists of a list of block sizes.
- * 
+ *
  * For example, the rule [2 4 3] describes a column/row consisting of, in order:
  * - any number of consecutive empty cells
  * - a block of exactly 2 consecutive filled cells

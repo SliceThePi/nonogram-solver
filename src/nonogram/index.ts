@@ -1,5 +1,6 @@
 export * from './primitives'
 export * from './errors'
+export * as Parser from './parser'
 export { default as BlockBounds } from './block_bounds'
 export { default as Cell } from './cell'
 export { default as Grid } from './grid'

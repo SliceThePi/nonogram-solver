@@ -1,6 +1,7 @@
 import {
     Cell,
     GridSlice,
+    UnsolvableError,
 } from '.'
 
 export default class BlockBounds {
@@ -22,6 +23,7 @@ export default class BlockBounds {
         this.start_positions.clear()
         for (let i = earliest_start; i <= latest_start; i++)
             this.start_positions.add(i)
+        this.narrow()
         this.#initialized = true
     }
 
@@ -33,6 +35,7 @@ export default class BlockBounds {
         if (!this.#initialized)
             return false
         let updated = false
+        this.narrow()
         if (this.is_fixed) {
             if (this.grid_slice.start_border_cell)
                 updated = this.grid_slice.start_border_cell.empty() || updated
@@ -43,8 +46,43 @@ export default class BlockBounds {
         return updated
     }
 
+    /**
+     * Based on the current state of the grid slice, eliminates invalid starting positions for this block.
+     * - If a cell that would be covered by the block in a given starting position is empty, that starting position can be eliminated.
+     * - If a cell that would be a border cell for the block in a given starting position is filled, that starting position can be eliminated.
+     * @returns Whether or not any starting positions were eliminated
+     */
+    narrow(): boolean {
+        if (!this.#initialized || this.is_fixed)
+            return false
+        let updated: boolean = false
+        for (const start of this.start_positions)
+            if (this.grid_slice.get(start - 1)?.state || this.grid_slice.get(start + this.length)?.state) {
+                this.start_positions.delete(start)
+                updated = true
+            }
+            else if (Cell.anyEmpty(this.grid_slice.subslice(start, this.length))) {
+                this.start_positions.delete(start)
+                updated = true
+            }
+        if (this.start_positions.size === 0)
+            throw new UnsolvableError()
+        return updated
+    }
+
+    get relevant_cells(): readonly Cell[] {
+        if (!this.#initialized)
+            return []
+        const cells: Set<Cell> = new Set()
+        for (const start of this.start_positions)
+            for (let i = start - 1; i < start + this.length + 1; i++)
+                cells.add(this.grid_slice.get(i)!)
+        cells.delete(null)
+        return [...cells.values()]
+    }
+
     get is_fixed(): boolean {
-        return this.freedom === 0
+        return this.latest_start - this.earliest_start === 0
     }
 
     get mandatory_cells(): readonly Cell[] {
@@ -58,7 +96,7 @@ export default class BlockBounds {
     }
 
     get freedom(): number {
-        return this.latest_start - this.earliest_start
+        return this.start_positions.size - 1
     }
 
     get earliest_start(): number {

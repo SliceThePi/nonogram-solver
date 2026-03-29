@@ -51,20 +51,50 @@ export default class Cell {
     }
 
     static emptyAll(cells: readonly Cell[]): boolean {
-        return cells.some(cell => cell.empty())
+        return cells.map(cell => cell.empty()).some(x => x)
     }
 
     static fillAll(cells: readonly Cell[]): boolean {
-        return cells.some(cell => cell.fill())
+        return cells.map(cell => cell.fill()).some(x => x)
     }
 
     static unsetAll(cells: readonly Cell[]): boolean {
-        return cells.some(cell => cell.unset())
+        return cells.map(cell => cell.unset()).some(x => x)
     }
 
     static setAll(cells: readonly Cell[], states: readonly CellState[]): boolean {
         if (cells.length != states.length)
             throw new GridElementLengthError('slice')
-        return cells.some((cell, idx) => cell.update(states[idx]))
+        return cells.map((cell, idx) => cell.update(states[idx])).some(x => x)
+    }
+
+    static allEmpty(cells: readonly Cell[]): boolean {
+        return cells.every(cell => cell.state === false)
+    }
+
+    static allFull(cells: readonly Cell[]): boolean {
+        return cells.every(cell => cell.state === true)
+    }
+
+    static allUnset(cells: readonly Cell[]): boolean {
+        return cells.every(cell => cell.state === undefined)
+    }
+
+    static allSet(cells: readonly Cell[], states: readonly CellState[]): boolean {
+        if (cells.length != states.length)
+            throw new GridElementLengthError('slice')
+        return cells.every((cell, idx) => cell.state === states[idx])
+    }
+
+    static anyEmpty(cells: readonly Cell[]): boolean {
+        return cells.map(cell => cell.state === false).some(x => x)
+    }
+
+    static anyFull(cells: readonly Cell[]): boolean {
+        return cells.map(cell => cell.state === true).some(x => x)
+    }
+
+    static anyUnset(cells: readonly Cell[]): boolean {
+        return cells.map(cell => cell.state === undefined).some(x => x)
     }
 }

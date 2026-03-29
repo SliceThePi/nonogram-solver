@@ -2,7 +2,7 @@ import type { GridErrorType } from './primitives'
 
 export class NonogramError extends Error {
     constructor(message?: string) {
-        super(`GridError${message ? ': ' + message : ''}`)
+        super(`NonogramError${message ? ': ' + message : ''}`)
     }
 }
 
@@ -50,5 +50,17 @@ export class GridRangeError extends NonogramError {
             super('Subgrid index out of range!')
         else
             super('Grid coordinates out of range!')
+    }
+}
+
+export class UnsolvableError extends NonogramError {
+    constructor() {
+        super('Puzzle is unsolvable!')
+    }
+}
+
+export class NonogramParseError extends NonogramError {
+    constructor(message?: string) {
+        super(`Failed to parse Nonogram${message ? ': ' + message : ''}`)
     }
 }

@@ -19,7 +19,7 @@ export default class Grid {
     constructor(cells: PrimitiveGrid<Cell>)
     constructor(arg: number | PrimitiveGrid<Cell>, height?: number) {
         if (typeof arg === 'number') {
-            this.#cells = new Array(height).fill(null).map(() => new Array(arg).fill(null))
+            this.#cells = Array.from({ length: height! }, () => Array.from({ length: arg }, () => new Cell()))
         }
         else {
             this.#cells = arg.map(row => row.slice())
@@ -67,7 +67,7 @@ export default class Grid {
             return new GridSlice(this, vec)
         else {
             const cell = this.getCell(vec)
-            if(!cell)
+            if (!cell)
                 throw new GridRangeError('cell')
             return cell
         }
@@ -181,7 +181,7 @@ export default class Grid {
 
     pushRow(row?: readonly Cell[]) {
         if (!row)
-            this.#cells.push(new Array(this.width).fill(null).map(() => new Cell()))
+            this.#cells.push(Array.from({ length: this.width }, () => new Cell()))
         else if (row.length != this.width)
             throw new GridElementLengthError('row')
         else
@@ -197,7 +197,7 @@ export default class Grid {
 
     unshiftRow(row?: readonly Cell[]) {
         if (!row)
-            this.#cells.unshift(new Array(this.width).fill(null).map(() => new Cell()))
+            this.#cells.unshift(Array.from({ length: this.width }, () => new Cell()))
         else if (row.length != this.width)
             throw new GridElementLengthError('row')
         else
