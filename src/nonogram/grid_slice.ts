@@ -24,7 +24,7 @@ export default class GridSlice {
         else
             slice_index = index as SliceIndex
         const grid_size = slice_index.vector.axis === 'row' ? grid.width : grid.height
-        if (slice_index.start < 0 || slice_index.start + slice_index.length >= grid_size)
+        if (slice_index.start < 0 || slice_index.start + slice_index.length > grid_size)
             throw new GridRangeError()
         this.grid = grid
         this.index = slice_index
@@ -40,6 +40,12 @@ export default class GridSlice {
         if (index === this.end_index + 1)
             return this.end_border_cell
         return this.cells[index - this.start_index] || null
+    }
+
+    subslice(start: number, length: number): Cell[] {
+        if (start < this.start_index || start + length - 1 > this.end_index)
+            throw new GridRangeError()
+        return this.cells.slice(start - this.start_index, start - this.start_index + length)
     }
 
     get start_index(): number {

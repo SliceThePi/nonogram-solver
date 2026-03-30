@@ -1,8 +1,5 @@
 import {
-    Cell,
-    EmptyGridElementError,
     Grid,
-    Point,
     PrimitiveGrid,
     Rule,
     RuleVector,
